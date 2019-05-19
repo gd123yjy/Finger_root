@@ -130,7 +130,7 @@ def main(_):
     clone_batch_size = 8
     # steps_per_epoch = int(1800 / clone_batch_size)
     # m_epoch = int((FLAGS.training_number_of_steps+1800) / 1800)
-    steps_per_epoch = int(40000 / clone_batch_size * 60 * 1)
+    steps_per_epoch = int(3000 / clone_batch_size * 60 * 1)
     m_epoch = 1
 
     train_dataset = data_generator.Dataset(

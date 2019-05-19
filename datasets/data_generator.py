@@ -173,8 +173,9 @@ class Dataset(object):
         parsed_features = tf.parse_single_example(example_proto, features)
 
         image = _decode_image(parsed_features['image/encoded'], channels=3)
-        image = tf.cast(image, dtype=tf.float64)
-        image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float64))
+        # todo
+        # image = tf.cast(image, dtype=tf.float64)
+        # image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float64))
 
         label = None
         if self.split_name != common.TEST_SET:

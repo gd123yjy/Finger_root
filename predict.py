@@ -14,21 +14,25 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('image_dir', '/home/yjy/dataset/palmprint_dectection/LHand/palmvein_val',  # palmprint_val
                     'Path to the where the images are.')
 flags.DEFINE_string('image_save_dir', '/home/yjy/dataset/palmprint_dectection/LHand/palmprint_predict',
-                    'Path to the where the images to be saved.')
+                    'Path to where the images to be saved.')
+flags.DEFINE_string('roi_save_dir',
+                    '/home/yjy/PycharmProjects/firstAI/Finger_roots_Eager/datasets/LHand/palmprint_trainval',
+                    'Path to where the roi.txt to be saved.')
 
-img_h = int(480 * FLAGS.scale_factor)
-img_w = int(640 * FLAGS.scale_factor)
+img_h = int(480)
+img_w = int(640)
 
 divided_factor = 255.0
 
 
 def pre_process(m_image):
-    result = cv2.resize(src=m_image, dsize=None, fx=FLAGS.scale_factor, fy=FLAGS.scale_factor)
-    return result / divided_factor
+    # result = cv2.resize(src=m_image, dsize=None, fx=1, fy=1)
+    # result /= divided_factor
+    return m_image
 
 
 def post_process(m_coordinates):
-    return m_coordinates / FLAGS.scale_factor
+    return m_coordinates
 
 
 if __name__ == '__main__':
@@ -49,8 +53,7 @@ if __name__ == '__main__':
         print('model file cannot be found')
 
     roi_save_file = open(
-        os.path.join("/home/yjy/PycharmProjects/firstAI/Finger_roots_Eager/datasets/LHand/palmprint_trainval",
-                     "figCon_nn.txt"), 'w')
+        os.path.join(FLAGS.roi_save_dir, "figCon_nn.txt"), 'w')
     files = os.listdir(FLAGS.image_dir)
 
     test_images = np.zeros((1, img_h, img_w, 3))
