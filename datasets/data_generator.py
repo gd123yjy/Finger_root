@@ -87,7 +87,8 @@ class Dataset(object):
                  dataset_dir,
                  batch_size,
                  crop_size,
-                 scale_factor=1.,
+                 min_scale_factor=1.,
+                 max_scale_factor=1.,
                  num_readers=1,
                  is_training=False,
                  should_shuffle=False,
@@ -122,7 +123,8 @@ class Dataset(object):
         self.dataset_dir = dataset_dir
         self.batch_size = batch_size
         self.crop_size = crop_size
-        self.scale_factor = scale_factor
+        self.min_scale_factor = min_scale_factor
+        self.max_scale_factor = max_scale_factor
         self.num_readers = num_readers
         self.is_training = is_training
         self.should_shuffle = should_shuffle
@@ -209,19 +211,20 @@ class Dataset(object):
         image = sample[common.IMAGE]
         label = sample[common.LABELS_COORDINATES]
 
-        original_image, image, label = input_preprocess. \
-            preprocess_image_and_label_yjy(image=image, label=label,
-                                           scale_factor=self.scale_factor,
+        original_image, image, original_label, label = input_preprocess. \
+            preprocess_image_and_label_yjy(image=image, label=label, crop_height=self.crop_size[0],
+                                           crop_width=self.crop_size[1], min_scale_factor=self.min_scale_factor,
+                                           max_scale_factor=self.max_scale_factor,
                                            is_training=self.is_training)
 
         sample[common.IMAGE] = image
+        if label is not None:
+            sample[common.LABEL] = label
 
         if not self.is_training:
             # Original image is only used during visualization.
             sample[common.ORIGINAL_IMAGE] = original_image
-
-        if label is not None:
-            sample[common.LABEL] = label
+            sample[common.ORIGINAL_LABEL] = original_label
 
         # Remove common.LABELS_COORDINATES key in the sample since it is only used to
         # derive label and not used in training and evaluation.
@@ -230,6 +233,8 @@ class Dataset(object):
         return sample
 
     def _reserve_input_and_target(self, sample):
+        if not self.is_training:
+            return sample[common.ORIGINAL_IMAGE], sample[common.ORIGINAL_LABEL]
         return sample[common.IMAGE], sample[common.LABEL]
 
     def get_one_shot_iterator(self):

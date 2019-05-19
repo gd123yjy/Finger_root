@@ -22,9 +22,12 @@ flags.DEFINE_string('model_dir', '/home/yjy/models_pretrain/fingerRoot/LHand',
 flags.DEFINE_string('model_name', None, 'file name of model.')  # 'Finger_roots.h5'
 
 # preprocess
-flags.DEFINE_float('scale_factor', 0.4,
-                   'scale factor for data augmentation.')
-flags.DEFINE_multi_integer('train_crop_size', [int(480 * FLAGS.scale_factor), int(640 * FLAGS.scale_factor)],
+flags.DEFINE_float('min_scale_factor', 0.7,
+                   'Mininum scale factor for data augmentation.')
+
+flags.DEFINE_float('max_scale_factor', 1.1,
+                   'Maximum scale factor for data augmentation.')
+flags.DEFINE_multi_integer('train_crop_size', [480, 640],
                            'Image crop size [height, width] during training.')
 
 # learning
@@ -127,7 +130,7 @@ def main(_):
     clone_batch_size = 8
     # steps_per_epoch = int(1800 / clone_batch_size)
     # m_epoch = int((FLAGS.training_number_of_steps+1800) / 1800)
-    steps_per_epoch = int(1000 * FLAGS.scale_factor / clone_batch_size * 60 * 7)
+    steps_per_epoch = int(40000 / clone_batch_size * 60 * 1)
     m_epoch = 1
 
     train_dataset = data_generator.Dataset(
@@ -136,7 +139,8 @@ def main(_):
         dataset_dir=FLAGS.dataset_dir,
         batch_size=clone_batch_size,
         crop_size=FLAGS.train_crop_size,
-        scale_factor=FLAGS.scale_factor,
+        min_scale_factor=FLAGS.min_scale_factor,
+        max_scale_factor=FLAGS.max_scale_factor,
         num_readers=2,
         is_training=True,
         should_shuffle=True,
@@ -149,7 +153,8 @@ def main(_):
         dataset_dir=FLAGS.dataset_dir,
         batch_size=clone_batch_size,
         crop_size=FLAGS.train_crop_size,
-        scale_factor=FLAGS.scale_factor,
+        min_scale_factor=FLAGS.min_scale_factor,
+        max_scale_factor=FLAGS.max_scale_factor,
         num_readers=2,
         is_training=False,
         should_shuffle=True,
