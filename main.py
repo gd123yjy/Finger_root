@@ -13,7 +13,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('dataset', 'pp_detect', 'Name of the dataset.')
 flags.DEFINE_string('train_split', 'train', 'Which split of the dataset to be used for training')
 flags.DEFINE_string('test_split', 'val', 'Which split of the dataset to be used for testing')
-flags.DEFINE_string('dataset_dir', '/home/yjy/PycharmProjects/firstAI/Finger_roots/datasets/LHand/tfrecord',
+flags.DEFINE_string('dataset_dir', './datasets/LHand/tfrecord',
                     'Where the dataset reside.')
 
 # log and model
