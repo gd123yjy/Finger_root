@@ -27,7 +27,7 @@ divided_factor = 255.0
 
 def pre_process(m_image):
     # result = cv2.resize(src=m_image, dsize=None, fx=1, fy=1)
-    m_image /= divided_factor
+    m_image = m_image / divided_factor
     return m_image
 
 
