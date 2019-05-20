@@ -13,7 +13,6 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
     original_image = image
     original_label = label
 
-    # todo
     processed_image = tf.cast(image, tf.float32)
 
     # randomly scale

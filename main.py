@@ -22,10 +22,10 @@ flags.DEFINE_string('model_dir', '/home/yjy/models_pretrain/fingerRoot/LHand',
 flags.DEFINE_string('model_name', None, 'file name of model.')  # 'Finger_roots.h5'
 
 # preprocess
-flags.DEFINE_float('min_scale_factor', 0.7,
+flags.DEFINE_float('min_scale_factor', 0.8,
                    'Mininum scale factor for data augmentation.')
 
-flags.DEFINE_float('max_scale_factor', 1.1,
+flags.DEFINE_float('max_scale_factor', 1.2,
                    'Maximum scale factor for data augmentation.')
 flags.DEFINE_multi_integer('train_crop_size', [480, 640],
                            'Image crop size [height, width] during training.')

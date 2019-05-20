@@ -173,9 +173,6 @@ class Dataset(object):
         parsed_features = tf.parse_single_example(example_proto, features)
 
         image = _decode_image(parsed_features['image/encoded'], channels=3)
-        # todo
-        # image = tf.cast(image, dtype=tf.float64)
-        # image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float64))
 
         label = None
         if self.split_name != common.TEST_SET:
@@ -233,6 +230,16 @@ class Dataset(object):
 
         return sample
 
+    def _regularize_image(self, sample):
+        image = tf.cast(sample[common.IMAGE], dtype=tf.float32)
+        origin_image = tf.cast(sample[common.IMAGE], dtype=tf.float32)
+        image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float32))
+        origin_image = tf.math.divide(origin_image, tf.constant(value=255.0, dtype=tf.float32))
+        sample[common.IMAGE] = image
+        sample[common.ORIGINAL_IMAGE] = origin_image
+
+        return sample
+
     def _reserve_input_and_target(self, sample):
         if not self.is_training:
             return sample[common.ORIGINAL_IMAGE], sample[common.ORIGINAL_LABEL]
@@ -251,6 +258,7 @@ class Dataset(object):
         dataset = (tfrecord_dataset
                    .map(self._parse_function, num_parallel_calls=self.num_readers)
                    .map(self._preprocess_image, num_parallel_calls=self.num_readers)
+                   .map(self._regularize_image, num_parallel_calls=self.num_readers)
                    .map(self._reserve_input_and_target, num_parallel_calls=self.num_readers))
 
         if self.should_shuffle:
