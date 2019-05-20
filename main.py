@@ -22,20 +22,23 @@ flags.DEFINE_string('model_dir', '/home/yjy/models_pretrain/fingerRoot/LHand',
 flags.DEFINE_string('model_name', None, 'file name of model.')  # 'Finger_roots.h5'
 
 # preprocess
-flags.DEFINE_float('min_scale_factor', 0.8,
+flags.DEFINE_float('min_scale_factor', 0.7,
                    'Mininum scale factor for data augmentation.')
 
-flags.DEFINE_float('max_scale_factor', 1.2,
+flags.DEFINE_float('max_scale_factor', 1.3,
                    'Maximum scale factor for data augmentation.')
 flags.DEFINE_multi_integer('train_crop_size', [480, 640],
                            'Image crop size [height, width] during training.')
 
 # learning
+flags.DEFINE_integer('batch_size', 8, 'batch size')
+flags.DEFINE_integer('epoch', 1, 'Train epoch')
 flags.DEFINE_float('momentum', 0.9, 'The momentum value to use')
+# todo: currently useless
 flags.DEFINE_float('base_learning_rate', 0.001,
                    'The base learning rate for model training.')
-flags.DEFINE_integer('training_number_of_steps', 24000,
-                     'The number of steps used for training')
+flags.DEFINE_integer('training_number_of_steps', int(400 * 60 * 1),
+                     'The number of training steps per epoch ')
 flags.DEFINE_float('learning_rate_decay_factor', 0.5,
                    'The rate to decay the base learning rate.')
 
@@ -127,11 +130,9 @@ def eval_and_predict(m_model, iterator):
 
 
 def main(_):
-    clone_batch_size = 8
-    # steps_per_epoch = int(1800 / clone_batch_size)
-    # m_epoch = int((FLAGS.training_number_of_steps+1800) / 1800)
-    steps_per_epoch = int(3000 / clone_batch_size * 60 * 1)
-    m_epoch = 1
+    clone_batch_size = FLAGS.batch_size
+    steps_per_epoch = FLAGS.training_number_of_steps
+    m_epoch = FLAGS.epoch
 
     train_dataset = data_generator.Dataset(
         dataset_name=FLAGS.dataset,

@@ -125,10 +125,13 @@ def random_crop(image, label, crop_height, crop_width):
     with tf.control_dependencies(asserts):
         max_offset_height = tf.reshape(image_height - crop_height + 1, [])
         max_offset_width = tf.reshape(image_width - crop_width + 1, [])
-    offset_height = tf.random_uniform(
-        [], maxval=max_offset_height, dtype=tf.int32)
-    offset_width = tf.random_uniform(
-        [], maxval=max_offset_width, dtype=tf.int32)
+    # todo: offset should be max,because it has to be symmetric with the case that scaling smaller
+    # offset_height = tf.random_uniform(
+    #     [], maxval=max_offset_height, dtype=tf.int32)
+    # offset_width = tf.random_uniform(
+    #     [], maxval=max_offset_width, dtype=tf.int32)
+    offset_height = max_offset_height
+    offset_width = max_offset_width
 
     return _crop(image, offset_height, offset_width, crop_height, crop_width), _crop_label(label, offset_height,
                                                                                            offset_width)
