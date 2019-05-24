@@ -6,7 +6,7 @@ import tensorflow as tf
 
 from main import build_model
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
 
 # flags.DEFINE_string('image_path', '/home/yjy/dataset/palmprint_dectection/palmprint_val/IMG_0248_012_LLL_012_100.bmp',

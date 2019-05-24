@@ -23,7 +23,7 @@ _MEAN_RGB = [123.15, 115.90, 103.06]
 def _preprocess_subtract_imagenet_mean(inputs, dtype=tf.float32):
     """Subtract Imagenet mean RGB value."""
     mean_rgb = tf.reshape(_MEAN_RGB, [1, 1, 1, 3])
-    num_channels = tf.shape(inputs)[-1]
+    num_channels = tf.shape(input=inputs)[-1]
     # We set mean pixel as 0 for the non-RGB channels.
     mean_rgb_extended = tf.concat(
         [mean_rgb, tf.zeros([1, 1, 1, num_channels - 3])], axis=3)
@@ -32,7 +32,7 @@ def _preprocess_subtract_imagenet_mean(inputs, dtype=tf.float32):
 
 def _preprocess_zero_mean_unit_range(inputs, dtype=tf.float32):
     """Map image values from [0, 255] to [-1, 1]."""
-    preprocessed_inputs = (2.0 / 255.0) * tf.to_float(inputs) - 1.0
+    preprocessed_inputs = (2.0 / 255.0) * tf.cast(inputs, dtype=tf.float32) - 1.0
     return tf.cast(preprocessed_inputs, dtype=dtype)
 
 

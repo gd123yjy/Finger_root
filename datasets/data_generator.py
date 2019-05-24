@@ -149,28 +149,28 @@ class Dataset(object):
         # extend label if necessary.
         def _decode_image(content, channels):
             return tf.cond(
-                tf.image.is_jpeg(content),
-                lambda: tf.image.decode_jpeg(content, channels),
-                lambda: tf.image.decode_png(content, channels))
+                pred=tf.image.is_jpeg(content),
+                true_fn=lambda: tf.image.decode_jpeg(content, channels),
+                false_fn=lambda: tf.image.decode_png(content, channels))
 
         features = {
             'image/encoded':
-                tf.FixedLenFeature((), tf.string),
+                tf.io.FixedLenFeature((), tf.string),
             'image/filename':
-                tf.FixedLenFeature((), tf.string, default_value=''),
+                tf.io.FixedLenFeature((), tf.string, default_value=''),
             'image/format':
-                tf.FixedLenFeature((), tf.string, default_value='jpg'),
+                tf.io.FixedLenFeature((), tf.string, default_value='jpg'),
             'image/height':
-                tf.FixedLenFeature((), tf.int64, default_value=0),
+                tf.io.FixedLenFeature((), tf.int64, default_value=0),
             'image/width':
-                tf.FixedLenFeature((), tf.int64, default_value=0),
+                tf.io.FixedLenFeature((), tf.int64, default_value=0),
             'image/channels':
-                tf.FixedLenFeature((), tf.int64, default_value=0),
+                tf.io.FixedLenFeature((), tf.int64, default_value=0),
             'image/labels/coordinates':
-                tf.FixedLenFeature((6), tf.int64),
+                tf.io.FixedLenFeature((6), tf.int64),
         }
 
-        parsed_features = tf.parse_single_example(example_proto, features)
+        parsed_features = tf.io.parse_single_example(serialized=example_proto, features=features)
 
         image = _decode_image(parsed_features['image/encoded'], channels=3)
 
@@ -270,7 +270,7 @@ class Dataset(object):
             dataset = dataset.repeat(1)
 
         dataset = dataset.batch(self.batch_size).prefetch(self.batch_size)
-        return dataset.make_one_shot_iterator()
+        return tf.compat.v1.data.make_one_shot_iterator(dataset)
 
     def _get_all_files(self):
         """Gets all the files to read data from.
@@ -281,4 +281,4 @@ class Dataset(object):
         file_pattern = _FILE_PATTERN
         file_pattern = os.path.join(self.dataset_dir,
                                     file_pattern % self.split_name)
-        return tf.gfile.Glob(file_pattern)
+        return tf.io.gfile.glob(file_pattern)

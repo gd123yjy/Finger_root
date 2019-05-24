@@ -50,7 +50,7 @@ def _crop(image, offset_height, offset_width, crop_height, crop_width):
       InvalidArgumentError: if the rank is not 3 or if the image dimensions are
         less than the crop size.
     """
-    original_shape = tf.shape(image)
+    original_shape = tf.shape(input=image)
 
     if len(image.get_shape().as_list()) != 3:
         raise ValueError('input must have rank of 3')
@@ -68,7 +68,7 @@ def _crop(image, offset_height, offset_width, crop_height, crop_width):
             tf.greater_equal(original_shape[1], crop_width)),
         ['Crop size greater than the image size.'])
 
-    offsets = tf.to_int32(tf.stack([offset_height, offset_width, 0]))
+    offsets = tf.cast(tf.stack([offset_height, offset_width, 0]), dtype=tf.int32)
 
     # Use tf.slice instead of crop_to_bounding box as it accepts tensors to
     # define the crop size.
@@ -107,7 +107,7 @@ def random_crop(image, label, crop_height, crop_width):
          image.name, 3, image_rank])
 
     with tf.control_dependencies([rank_assert]):
-        image_shape = tf.shape(image)
+        image_shape = tf.shape(input=image)
     image_height = image_shape[0]
     image_width = image_shape[1]
     crop_size_assert = tf.Assert(
@@ -158,18 +158,18 @@ def get_rotate_scale(min_rotate_factor, max_rotate_factor, step_size):
         raise ValueError('Unexpected value of min_rotate_factor.')
 
     if min_rotate_factor == max_rotate_factor:
-        return tf.to_float(min_rotate_factor)
+        return tf.cast(min_rotate_factor, dtype=tf.float32)
 
     if step_size == 0:
-        return tf.random_uniform([1],
+        return tf.random.uniform([1],
                                  minval=min_rotate_factor,
                                  maxval=max_rotate_factor)
     # num_steps = int((max_rotate_factor - min_rotate_factor) / step_size + 1)
     # rotate_factors = tf.lin_space(min_rotate_factor / float(step_size), max_rotate_factor / float(step_size), num_steps)
     # shuffled_rotate_factors = tf.random_shuffle(rotate_factors)
     rotate_factors = [0, 2]
-    shuffled_rotate_factors = tf.random_shuffle(rotate_factors)
-    return tf.to_int32(shuffled_rotate_factors[0])
+    shuffled_rotate_factors = tf.random.shuffle(rotate_factors)
+    return tf.cast(shuffled_rotate_factors[0], dtype=tf.int32)
 
 
 def get_random_scale(min_scale_factor, max_scale_factor, step_size):
@@ -190,18 +190,18 @@ def get_random_scale(min_scale_factor, max_scale_factor, step_size):
         raise ValueError('Unexpected value of min_scale_factor.')
 
     if min_scale_factor == max_scale_factor:
-        return tf.to_float(min_scale_factor)
+        return tf.cast(min_scale_factor, dtype=tf.float32)
 
     # When step_size = 0, we sample the value uniformly from [min, max).
     if step_size == 0:
-        return tf.random_uniform([1],
+        return tf.random.uniform([1],
                                  minval=min_scale_factor,
                                  maxval=max_scale_factor)
 
     # When step_size != 0, we randomly select one discrete value from [min, max].
     num_steps = int((max_scale_factor - min_scale_factor) / step_size + 1)
-    scale_factors = tf.lin_space(min_scale_factor, max_scale_factor, num_steps)
-    shuffled_scale_factors = tf.random_shuffle(scale_factors)
+    scale_factors = tf.linspace(min_scale_factor, max_scale_factor, num_steps)
+    shuffled_scale_factors = tf.random.shuffle(scale_factors)
     return shuffled_scale_factors[0]
 
 
@@ -235,7 +235,7 @@ def pad_to_bounding_box(image, offset_height, offset_width, target_height,
          3, image_rank])
     with tf.control_dependencies([image_rank_assert]):
         image -= pad_value
-    image_shape = tf.shape(image)
+    image_shape = tf.shape(input=image)
     height, width = image_shape[0], image_shape[1]
     target_width_assert = tf.Assert(
         tf.greater_equal(
@@ -259,7 +259,7 @@ def pad_to_bounding_box(image, offset_height, offset_width, target_height,
     channel_params = tf.stack([0, 0])
     with tf.control_dependencies([offset_assert]):
         paddings = tf.stack([height_params, width_params, channel_params])
-    padded = tf.pad(image, paddings)
+    padded = tf.pad(tensor=image, paddings=paddings)
     return padded + pad_value
 
 
@@ -275,7 +275,7 @@ def randomly_rotate_image_and_label(image, label, rotate_factor=0):
     Returns:
       rotated image and label.
     """
-    image_shape = tf.shape(image)
+    image_shape = tf.shape(input=image)
     middle = [image_shape[1] / 2, image_shape[0] / 2,
               image_shape[1] / 2, image_shape[0] / 2,
               image_shape[1] / 2, image_shape[0] / 2]
@@ -283,9 +283,9 @@ def randomly_rotate_image_and_label(image, label, rotate_factor=0):
     middle = tf.reshape(middle, (6, 1))
     label = tf.cast(label, dtype=tf.float32)
     label = tf.reshape(label, (6, 1))
-    cos = tf.math.cos(tf.to_float(rotate_factor) * math.pi / 2)
-    sin = tf.math.sin(tf.to_float(rotate_factor) * math.pi / 2)
-    rotate_matrix = tf.convert_to_tensor([[cos, sin, 0, 0, 0, 0],
+    cos = tf.math.cos(tf.cast(rotate_factor, dtype=tf.float32) * math.pi / 2)
+    sin = tf.math.sin(tf.cast(rotate_factor, dtype=tf.float32) * math.pi / 2)
+    rotate_matrix = tf.convert_to_tensor(value=[[cos, sin, 0, 0, 0, 0],
                                           [-sin, cos, 0, 0, 0, 0],
                                           [0, 0, cos, sin, 0, 0],
                                           [0, 0, -sin, cos, 0, 0],
@@ -312,13 +312,13 @@ def randomly_scale_image_and_label(image, label=None, scale=1.0):
     # No random scaling if scale == 1.
     if scale == 1.0:
         return image, label
-    image_shape = tf.shape(image)
-    new_dim = tf.to_int32(tf.to_float([image_shape[0], image_shape[1]]) * scale)
+    image_shape = tf.shape(input=image)
+    new_dim = tf.cast(tf.cast([image_shape[0], image_shape[1]], dtype=tf.float32) * scale, dtype=tf.int32)
 
     # Need squeeze and expand_dims because image interpolation takes
     # 4D tensors as input.
-    image = tf.squeeze(tf.image.resize_bilinear(tf.expand_dims(image, 0),
-                                                new_dim, align_corners=True), [0])
+    image = tf.squeeze(tf.image.resize(tf.expand_dims(image, 0),
+                                       new_dim, method=tf.image.ResizeMethod.BILINEAR), [0])
 
     label = tf.cast(label, tf.float32)
     label = tf.multiply(label, scale)
@@ -341,14 +341,14 @@ def resolve_shape(tensor, rank=None, scope=None):
     Returns:
       shape: The full shape of the tensor.
     """
-    with tf.name_scope(scope, 'resolve_shape', [tensor]):
+    with tf.compat.v1.name_scope(scope, 'resolve_shape', [tensor]):
         if rank is not None:
             shape = tensor.get_shape().with_rank(rank).as_list()
         else:
             shape = tensor.get_shape().as_list()
 
         if None in shape:
-            shape_dynamic = tf.shape(tensor)
+            shape_dynamic = tf.shape(input=tensor)
             for i in range(len(shape)):
                 if shape[i] is None:
                     shape[i] = shape_dynamic[i]

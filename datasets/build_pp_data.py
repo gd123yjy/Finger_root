@@ -55,23 +55,23 @@ import build_data
 import math
 import tensorflow as tf
 
-FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('image_folder',
+tf.compat.v1.app.flags.DEFINE_string('image_folder',
                            './LHand/palmprint_trainval',
                            'Folder containing images.')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'coordinates_filename_folder',
     './LHand/palmprint_trainval',
     'Folder containing coordinates labels')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'list_folder',
     './LHand',
     'Folder containing lists for training and validation')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'output_dir',
     './LHand/tfrecord',
     'Path to save converted SSTable of TensorFlow examples.')
@@ -99,14 +99,14 @@ def _convert_dataset(dataset_split):
     coordinates_filename = os.path.join(
         FLAGS.coordinates_filename_folder,
         coordinate_filenames + '.' + FLAGS.label_format)
-    coordinates_data = tf.gfile.FastGFile(coordinates_filename, 'r').read()
+    coordinates_data = tf.compat.v1.gfile.FastGFile(coordinates_filename, 'r').read()
     label_reader = build_data.TxtReader(coordinates_data)
 
     for shard_id in range(_NUM_SHARDS):
         output_filename = os.path.join(
             FLAGS.output_dir,
             '%s-%05d-of-%05d.tfrecord' % (dataset, shard_id, _NUM_SHARDS))
-        with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+        with tf.io.TFRecordWriter(output_filename) as tfrecord_writer:
             start_idx = shard_id * num_per_shard
             end_idx = min((shard_id + 1) * num_per_shard, num_images)
             for i in range(start_idx, end_idx):
@@ -117,7 +117,7 @@ def _convert_dataset(dataset_split):
                 # Read the image.
                 image_filename = os.path.join(
                     FLAGS.image_folder, filenames[i] + '.' + FLAGS.image_format)
-                image_data = tf.gfile.FastGFile(image_filename, 'rb').read()
+                image_data = tf.compat.v1.gfile.FastGFile(image_filename, 'rb').read()
                 # tf.cast(image_data, tf.float64)
                 # image_data = tf.math.l2_normalize(image_data)
                 height, width = image_reader.read_image_dims(image_data)
@@ -134,11 +134,11 @@ def _convert_dataset(dataset_split):
 
 
 def main(unused_argv):
-    dataset_splits = tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt'))
+    dataset_splits = tf.io.gfile.glob(os.path.join(FLAGS.list_folder, '*.txt'))
     for dataset_split in dataset_splits:
         _convert_dataset(dataset_split)
 
 
 if __name__ == '__main__':
-    tf.enable_eager_execution()
-    tf.app.run()
+    tf.compat.v1.enable_eager_execution()
+    tf.compat.v1.app.run()

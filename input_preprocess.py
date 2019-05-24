@@ -30,7 +30,7 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
     processed_image.set_shape([None, None, 3])
 
     # Pad image to have dimensions >= [crop_height, crop_width]
-    image_shape = tf.shape(processed_image)
+    image_shape = tf.shape(input=processed_image)
     image_height = image_shape[0]
     image_width = image_shape[1]
 

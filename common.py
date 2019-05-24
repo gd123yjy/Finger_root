@@ -22,7 +22,7 @@ import json
 
 import tensorflow as tf
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 
 # Flags for input preprocessing.
 
@@ -191,7 +191,7 @@ class ModelOptions(
         """
         dense_prediction_cell_config = None
         if FLAGS.dense_prediction_cell_json:
-            with tf.gfile.Open(FLAGS.dense_prediction_cell_json, 'r') as f:
+            with tf.io.gfile.GFile(FLAGS.dense_prediction_cell_json, 'r') as f:
                 dense_prediction_cell_config = json.load(f)
         decoder_output_stride = None
         if FLAGS.decoder_output_stride:

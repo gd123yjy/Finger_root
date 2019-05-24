@@ -8,7 +8,7 @@ import cv2
 from datasets import data_generator
 import main
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
 
 
@@ -32,10 +32,10 @@ def handle_batch(images, labels):
     for i in range(len(images)):
         # image = images[i] * 255.0
         image = tf.math.multiply(images[i], tf.constant(255.0, tf.float64))
-        image = tf.to_int64(image)
+        image = tf.cast(image, dtype=tf.int64)
         image = image.numpy()
         image = image.astype('uint8').reshape((480, 640, 3))
-        label = tf.to_int64(labels[i])
+        label = tf.cast(labels[i], dtype=tf.int64)
         label = label.numpy()
         # filename = time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime(time.time()))
         filename = '%f' % time.time()
@@ -73,5 +73,5 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.enable_eager_execution()
-    tf.app.run(main=main)
+    tf.compat.v1.enable_eager_execution()
+    tf.compat.v1.app.run(main=main)

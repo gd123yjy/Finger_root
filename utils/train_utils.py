@@ -58,21 +58,21 @@ def get_model_learning_rate(learning_policy,
     Raises:
       ValueError: If learning policy or slow start burnin type is not recognized.
     """
-    global_step = tf.train.get_or_create_global_step()
+    global_step = tf.compat.v1.train.get_or_create_global_step()
     adjusted_global_step = global_step
 
     if slow_start_burnin_type != 'none':
         adjusted_global_step -= slow_start_step
 
     if learning_policy == 'step':
-        learning_rate = tf.train.exponential_decay(
+        learning_rate = tf.compat.v1.train.exponential_decay(
             base_learning_rate,
             adjusted_global_step,
             learning_rate_decay_step,
             learning_rate_decay_factor,
             staircase=True)
     elif learning_policy == 'poly':
-        learning_rate = tf.train.polynomial_decay(
+        learning_rate = tf.compat.v1.train.polynomial_decay(
             base_learning_rate,
             adjusted_global_step,
             training_number_of_steps,
@@ -88,10 +88,10 @@ def get_model_learning_rate(learning_policy,
         adjusted_slow_start_learning_rate = (
                 slow_start_learning_rate +
                 (base_learning_rate - slow_start_learning_rate) *
-                tf.to_float(global_step) / slow_start_step)
+                tf.cast(global_step, dtype=tf.float32) / slow_start_step)
     elif slow_start_burnin_type != 'none':
         raise ValueError('Unknown burnin type.')
 
     # Employ small learning rate at the first few steps for warm start.
-    return tf.where(global_step < slow_start_step,
-                    adjusted_slow_start_learning_rate, learning_rate)
+    return tf.compat.v1.where(global_step < slow_start_step,
+                              adjusted_slow_start_learning_rate, learning_rate)

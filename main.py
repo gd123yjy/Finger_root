@@ -6,7 +6,7 @@ import tensorflow as tf
 import model
 from datasets import data_generator
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
 
 # dataset
@@ -101,8 +101,8 @@ def train(m_model, iterator, spe, epoch, initial_epoch):
 
     def lr_adjust_callback(epoch_index):
         m_lr = FLAGS.base_learning_rate / (1 + FLAGS.learning_rate_decay_factor * epoch_index * spe)
-        tf.logging.info('epoch index=%d\n', epoch_index)
-        tf.logging.info('learning rate=%d\n', m_lr)
+        tf.compat.v1.logging.info('epoch index=%d\n', epoch_index)
+        tf.compat.v1.logging.info('learning rate=%d\n', m_lr)
         return m_lr
 
     # m_callbacks.append(tf.keras.callbacks.LearningRateScheduler(lr_adjust_callback, 1))
@@ -177,5 +177,5 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.enable_eager_execution()
-    tf.app.run(main=main)
+    tf.compat.v1.enable_eager_execution()
+    tf.compat.v1.app.run(main=main)
