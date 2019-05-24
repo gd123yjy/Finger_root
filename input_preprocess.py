@@ -15,6 +15,13 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
 
     processed_image = tf.cast(image, tf.float32)
 
+    # randomly rotate
+    # todo: rotate factor should be determined by command line
+    rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
+    processed_image, label = preprocess_utils.randomly_rotate_image_and_label(
+        processed_image, label, rotate_factor)
+    processed_image.set_shape([None, None, 3])
+
     # randomly scale
     scale_factor = preprocess_utils.get_random_scale(
         min_scale_factor, max_scale_factor, 0)
@@ -31,7 +38,7 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
     target_width = image_width + tf.maximum(crop_width - image_width, 0)
 
     # Pad image with mean pixel value.
-    mean_pixel = tf.reshape([127.5, 127.5, 127.5], [1, 1, 3])
+    mean_pixel = tf.reshape([0., 0., 0.], [1, 1, 3])  # [127.5, 127.5, 127.5]
     processed_image = preprocess_utils.pad_to_bounding_box(
         processed_image, 0, 0, target_height, target_width, mean_pixel)
 

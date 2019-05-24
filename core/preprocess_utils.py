@@ -15,6 +15,7 @@
 
 """Utility functions related to preprocessing inputs."""
 import tensorflow as tf
+import math
 
 
 def _crop_label(label, offset_height, offset_width):
@@ -125,16 +126,50 @@ def random_crop(image, label, crop_height, crop_width):
     with tf.control_dependencies(asserts):
         max_offset_height = tf.reshape(image_height - crop_height + 1, [])
         max_offset_width = tf.reshape(image_width - crop_width + 1, [])
-    # todo: offset should be max,because it has to be symmetric with the case that scaling smaller
+    # todo: offset should be 0,because it has to be symmetric with the case that scaling smaller
     # offset_height = tf.random_uniform(
     #     [], maxval=max_offset_height, dtype=tf.int32)
     # offset_width = tf.random_uniform(
     #     [], maxval=max_offset_width, dtype=tf.int32)
-    offset_height = max_offset_height
-    offset_width = max_offset_width
+    offset_height = 0
+    offset_width = 0
 
     return _crop(image, offset_height, offset_width, crop_height, crop_width), _crop_label(label, offset_height,
                                                                                            offset_width)
+
+
+# todo: return value should not be only 0 or 2
+def get_rotate_scale(min_rotate_factor, max_rotate_factor, step_size):
+    """Gets a random rotate value.
+
+      Args:
+        min_rotate_factor: Minimum rotate value.
+        max_rotate_factor: Maximum rotate value.
+        step_size: The step size from minimum to maximum value.
+
+      Returns:
+        A random rotate value selected between minimum and maximum value.(should be)
+        yet now we can only return emun{0,2} because it is hard to calculate label when rotate_factor = 1
+
+      Raises:
+        ValueError: min_rotate_factor has unexpected value.
+      """
+    if min_rotate_factor < 0 or min_rotate_factor > max_rotate_factor:
+        raise ValueError('Unexpected value of min_rotate_factor.')
+
+    if min_rotate_factor == max_rotate_factor:
+        return tf.to_float(min_rotate_factor)
+
+    if step_size == 0:
+        return tf.random_uniform([1],
+                                 minval=min_rotate_factor,
+                                 maxval=max_rotate_factor)
+    # num_steps = int((max_rotate_factor - min_rotate_factor) / step_size + 1)
+    # rotate_factors = tf.lin_space(min_rotate_factor / float(step_size), max_rotate_factor / float(step_size), num_steps)
+    # shuffled_rotate_factors = tf.random_shuffle(rotate_factors)
+    rotate_factors = [0, 2]
+    shuffled_rotate_factors = tf.random_shuffle(rotate_factors)
+    return tf.to_int32(shuffled_rotate_factors[0])
 
 
 def get_random_scale(min_scale_factor, max_scale_factor, step_size):
@@ -226,6 +261,41 @@ def pad_to_bounding_box(image, offset_height, offset_width, target_height,
         paddings = tf.stack([height_params, width_params, channel_params])
     padded = tf.pad(image, paddings)
     return padded + pad_value
+
+
+# todo: counter-clockwise rotate,rotate_factor=1 is hard to achieve
+def randomly_rotate_image_and_label(image, label, rotate_factor=0):
+    """counter-clockwise rotate image and label by 90*rotate_factor degree.
+
+    Args:
+      image: Image with shape [height, width, 3].
+      label: Label with shape [6]: [w,h,w,h,w,h]
+      rotate_factor: a tensor whose dtype=tf.int32
+
+    Returns:
+      rotated image and label.
+    """
+    image_shape = tf.shape(image)
+    middle = [image_shape[1] / 2, image_shape[0] / 2,
+              image_shape[1] / 2, image_shape[0] / 2,
+              image_shape[1] / 2, image_shape[0] / 2]
+    middle = tf.cast(middle, dtype=tf.float32)
+    middle = tf.reshape(middle, (6, 1))
+    label = tf.cast(label, dtype=tf.float32)
+    label = tf.reshape(label, (6, 1))
+    cos = tf.math.cos(tf.to_float(rotate_factor) * math.pi / 2)
+    sin = tf.math.sin(tf.to_float(rotate_factor) * math.pi / 2)
+    rotate_matrix = tf.convert_to_tensor([[cos, sin, 0, 0, 0, 0],
+                                          [-sin, cos, 0, 0, 0, 0],
+                                          [0, 0, cos, sin, 0, 0],
+                                          [0, 0, -sin, cos, 0, 0],
+                                          [0, 0, 0, 0, cos, sin],
+                                          [0, 0, 0, 0, -sin, cos]],
+                                         dtype=tf.float32)
+
+    image = tf.image.rot90(image, rotate_factor)
+    label = tf.matmul(rotate_matrix, (label - middle)) + middle
+    return image, tf.reshape(label, (6,))
 
 
 def randomly_scale_image_and_label(image, label=None, scale=1.0):

@@ -231,10 +231,10 @@ class Dataset(object):
         return sample
 
     def _regularize_image(self, sample):
-        image = tf.cast(sample[common.IMAGE], dtype=tf.float32)
-        origin_image = tf.cast(sample[common.IMAGE], dtype=tf.float32)
-        image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float32))
-        origin_image = tf.math.divide(origin_image, tf.constant(value=255.0, dtype=tf.float32))
+        image = tf.cast(sample[common.IMAGE], dtype=tf.float64)
+        origin_image = tf.cast(sample[common.IMAGE], dtype=tf.float64)
+        image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float64))
+        origin_image = tf.math.divide(origin_image, tf.constant(value=255.0, dtype=tf.float64))
         sample[common.IMAGE] = image
         sample[common.ORIGINAL_IMAGE] = origin_image
 

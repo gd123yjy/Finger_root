@@ -31,8 +31,8 @@ def my_train(epoch, steps_per_epoch, batch_handler, iterator):
 def handle_batch(images, labels):
     for i in range(len(images)):
         # image = images[i] * 255.0
-        # image = tf.math.multiply(images[i], tf.constant(255.0, tf.float32))
-        image = tf.to_int64(images[i])
+        image = tf.math.multiply(images[i], tf.constant(255.0, tf.float64))
+        image = tf.to_int64(image)
         image = image.numpy()
         image = image.astype('uint8').reshape((480, 640, 3))
         label = tf.to_int64(labels[i])
@@ -52,7 +52,7 @@ def main(_):
     clone_batch_size = 8
     # steps_per_epoch = int(1800 / clone_batch_size)
     # m_epoch = int((FLAGS.training_number_of_steps+1800) / 1800)
-    steps_per_epoch = int(3000 / clone_batch_size * 60 * 1)
+    steps_per_epoch = 600 * 4
     m_epoch = 1
 
     train_dataset = data_generator.Dataset(
