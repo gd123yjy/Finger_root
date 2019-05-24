@@ -76,8 +76,8 @@ def build_model():
                 if m_max < int(x[8:10]):
                     m_model_name = x
                     m_max = int(x[8:10])
-        # m_model = tf.keras.models.load_model(filepath=os.path.join(FLAGS.model_dir, m_model_name))
-        m_model.load_weights(filepath=os.path.join(FLAGS.model_dir, m_model_name))
+        m_model = tf.keras.models.load_model(filepath=os.path.join(FLAGS.model_dir, m_model_name))
+        # m_model.load_weights(filepath=os.path.join(FLAGS.model_dir, m_model_name))
 
     except tf.errors.NotFoundError as e:
         print(e)
@@ -108,7 +108,7 @@ def train(m_model, iterator, spe, epoch, initial_epoch):
     # m_callbacks.append(tf.keras.callbacks.LearningRateScheduler(lr_adjust_callback, 1))
     m_callbacks.append(
         tf.keras.callbacks.ModelCheckpoint(filepath=FLAGS.model_dir + '/weights.{epoch:02d}-{loss:.2f}.hdf5',
-                                           save_weights_only=True, verbose=1))
+                                           save_weights_only=False, verbose=1))
     # m_callbacks.append(tf.keras.callbacks.LambdaCallback(on_epoch_end=lambda batch, logs: print(logs['loss'])))
     m_model.fit(x=iterator, epochs=epoch, callbacks=m_callbacks, steps_per_epoch=spe)
     # m_model.fit(x=iterator, epochs=epoch, callbacks=m_callbacks, initial_epoch=initial_epoch, steps_per_epoch=spe)
