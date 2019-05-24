@@ -16,7 +16,7 @@ flags.DEFINE_string('image_dir', '/home/yjy/dataset/palmprint_dectection/LHand/p
 flags.DEFINE_string('image_save_dir', '/home/yjy/dataset/palmprint_dectection/LHand/palmprint_predict',
                     'Path to where the images to be saved.')
 flags.DEFINE_string('roi_save_dir',
-                    '/home/yjy/PycharmProjects/firstAI/Finger_roots_Eager/datasets/LHand/palmprint_trainval',
+                    '/home/yjy/PycharmProjects/Finger_roots_Eager/datasets/LHand/palmprint_trainval',
                     'Path to where the roi.txt to be saved.')
 
 img_h = int(480)
