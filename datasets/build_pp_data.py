@@ -122,6 +122,7 @@ def _convert_dataset(dataset_split):
                 # image_data = tf.math.l2_normalize(image_data)
                 height, width = image_reader.read_image_dims(image_data)
                 finger_roots = label_reader.read_coordinates_data(filenames[i] + '.' + FLAGS.image_format)
+                print(finger_roots)
                 if len(finger_roots) != 6:
                     raise ValueError("finger roots data: %s is illegal", finger_roots)
 

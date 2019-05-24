@@ -25,10 +25,10 @@ def get_model():
 
     flatten_5 = tf.keras.layers.Flatten(input_shape=(30, 40), trainable=True)(dropout_4)
 
-    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.elu, trainable=True)(flatten_5)
+    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.sigmoid, trainable=True)(flatten_5)
     dropout_5 = tf.keras.layers.Dropout(rate=0.5)(dense_5)
 
-    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.elu, trainable=True)(dropout_5)
+    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.sigmoid, trainable=True)(dropout_5)
 
     dense_7 = tf.keras.layers.Dense(6, activation=None, trainable=True)(dense_6)
 
