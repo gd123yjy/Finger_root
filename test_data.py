@@ -74,4 +74,4 @@ def main(_):
 
 if __name__ == '__main__':
     tf.enable_eager_execution()
-    tf.app.run(main=main, argv=[sys.argv[0]])
+    tf.app.run(main=main)

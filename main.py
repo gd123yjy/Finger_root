@@ -32,12 +32,12 @@ flags.DEFINE_multi_integer('train_crop_size', [480, 640],
 
 # learning
 flags.DEFINE_integer('batch_size', 8, 'batch size')
-flags.DEFINE_integer('epoch', 1, 'Train epoch')
+flags.DEFINE_integer('epoch', 2, 'Train epoch')
 flags.DEFINE_float('momentum', 0.9, 'The momentum value to use')
 # todo: currently useless
 flags.DEFINE_float('base_learning_rate', 0.001,
                    'The base learning rate for model training.')
-flags.DEFINE_integer('training_number_of_steps', int(400 * 60 * 1),
+flags.DEFINE_integer('training_number_of_steps', int(400 * 60 * 0.5),
                      'The number of training steps per epoch ')
 flags.DEFINE_float('learning_rate_decay_factor', 0.5,
                    'The rate to decay the base learning rate.')
@@ -178,4 +178,4 @@ def main(_):
 
 if __name__ == '__main__':
     tf.enable_eager_execution()
-    tf.app.run(main=main, argv=[sys.argv[0]])
+    tf.app.run(main=main)
