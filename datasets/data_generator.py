@@ -210,8 +210,10 @@ class Dataset(object):
         label = sample[common.LABELS_COORDINATES]
 
         original_image, image, original_label, label = input_preprocess. \
-            preprocess_image_and_label_yjy(image=image, label=label, crop_height=self.crop_size[0],
-                                           crop_width=self.crop_size[1], min_scale_factor=self.min_scale_factor,
+            preprocess_image_and_label_yjy(image=image, label=label,
+                                           crop_height=self.crop_size[0],
+                                           crop_width=self.crop_size[1],
+                                           min_scale_factor=self.min_scale_factor,
                                            max_scale_factor=self.max_scale_factor,
                                            is_training=self.is_training)
 
