@@ -18,14 +18,6 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width,
     processed_image = tf.cast(image, tf.float32)
     processed_label = tf.cast(label, tf.float32)
 
-    # todo: rotate factor should be determined by command line
-    if is_rotate:
-        # randomly rotate
-        rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
-        processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
-            processed_image, processed_label, rotate_factor)
-        processed_image.set_shape([None, None, 3])
-
     if is_scale:
         # randomly scale
         scale_factor = preprocess_utils.get_random_scale(
@@ -50,6 +42,14 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width,
         # crop to [crop_height,crop_width]
         processed_image, processed_label = preprocess_utils.random_crop(processed_image, processed_label, crop_height,
                                                                         crop_width)
+
+    # todo: rotate factor should be determined by command line
+    if is_rotate:
+        # randomly rotate
+        rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
+        processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
+            processed_image, processed_label, rotate_factor)
+        processed_image.set_shape([None, None, 3])
 
     if processed_label is not None:
         processed_label.set_shape([6])
