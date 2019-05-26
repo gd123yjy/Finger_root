@@ -15,9 +15,9 @@ flags.DEFINE_string('image_dir', '/home/yjy/dataset/palmprint_dectection/LHand/p
                     'Path to the where the images are.')
 flags.DEFINE_string('image_save_dir', '/home/yjy/dataset/palmprint_dectection/LHand/palmprint_predict',
                     'Path to where the images to be saved.')
-flags.DEFINE_string('roi_save_dir',
+flags.DEFINE_string('fincon_save_dir',
                     '/home/yjy/PycharmProjects/Finger_roots_Eager/datasets/LHand/palmprint_trainval',
-                    'Path to where the roi.txt to be saved.')
+                    'Path to where the figCon_nn.txt to be saved.')
 
 img_h = int(480)
 img_w = int(640)
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     except tf.errors.NotFoundError:
         print('model file cannot be found')
 
-    roi_save_file = open(
-        os.path.join(FLAGS.roi_save_dir, "figCon_nn.txt"), 'w')
+    finCon_save_file = open(
+        os.path.join(FLAGS.fincon_save_dir, "figCon_nn.txt"), 'w')
     files = os.listdir(FLAGS.image_dir)
 
     test_images = np.zeros((1, img_h, img_w, 3))
@@ -70,8 +70,9 @@ if __name__ == '__main__':
         cv2.circle(image, (coordinates[0][4], coordinates[0][5]), 5, (0, 255, 0))
 
         cv2.imwrite(os.path.join(FLAGS.image_save_dir, name + '.jpg'), image)
-        roi_save_file.write("%s %d %d %d %d %d %d\n" % (name, coordinates[0][0], coordinates[0][1], coordinates[0][2],
-                                                        coordinates[0][3], coordinates[0][4], coordinates[0][5]))
+        finCon_save_file.write(
+            "%s %d %d %d %d %d %d\n" % (name, coordinates[0][0], coordinates[0][1], coordinates[0][2],
+                                        coordinates[0][3], coordinates[0][4], coordinates[0][5]))
 
         # tmp = divided_factor * (test_images[0])
         # tmp = np.copy(tmp)
@@ -81,4 +82,4 @@ if __name__ == '__main__':
         # cv2.circle(tmp, (coordinates[0][4], coordinates[0][5]), 3, (0, 0, 255))
         #
         # cv2.imwrite(os.path.join(FLAGS.image_save_dir, name + '.jpg'), tmp)
-    roi_save_file.close()
+    finCon_save_file.close()

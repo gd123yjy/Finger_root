@@ -19,10 +19,10 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
     # randomly rotate
     # todo: rotate factor should be determined by command line
     # todo: command line should be able to control whether rotate or not
-    # rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
-    # processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
-    #     processed_image, processed_label, rotate_factor)
-    # processed_image.set_shape([None, None, 3])
+    rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
+    processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
+        processed_image, processed_label, rotate_factor)
+    processed_image.set_shape([None, None, 3])
 
     # randomly scale
     scale_factor = preprocess_utils.get_random_scale(
