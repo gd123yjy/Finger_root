@@ -41,6 +41,8 @@ flags.DEFINE_integer('training_number_of_steps', int(400 * 60 * 0.5),
                      'The number of training steps per epoch ')
 flags.DEFINE_float('learning_rate_decay_factor', 0.5,
                    'The rate to decay the base learning rate.')
+flags.DEFINE_bool('rotate', True, 'Whether rotate in pre-processing.')
+flags.DEFINE_bool('scale', True, 'Whether scale in pre-processing.')
 
 # useless flags below:
 flags.DEFINE_enum('learning_policy', 'poly', ['poly', 'step'],
@@ -140,6 +142,8 @@ def main(_):
         dataset_dir=FLAGS.dataset_dir,
         batch_size=clone_batch_size,
         crop_size=FLAGS.train_crop_size,
+        is_rotate=FLAGS.rotate,
+        is_scale=FLAGS.scale,
         min_scale_factor=FLAGS.min_scale_factor,
         max_scale_factor=FLAGS.max_scale_factor,
         num_readers=2,
@@ -154,6 +158,8 @@ def main(_):
         dataset_dir=FLAGS.dataset_dir,
         batch_size=clone_batch_size,
         crop_size=FLAGS.train_crop_size,
+        is_rotate=FLAGS.rotate,
+        is_scale=FLAGS.scale,
         min_scale_factor=FLAGS.min_scale_factor,
         max_scale_factor=FLAGS.max_scale_factor,
         num_readers=2,

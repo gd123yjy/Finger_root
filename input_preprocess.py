@@ -4,8 +4,10 @@ import tensorflow as tf
 from core import preprocess_utils
 
 
-def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_scale_factor=1.,
-                                   max_scale_factor=1., is_training=True):
+def preprocess_image_and_label_yjy(image, label, crop_height, crop_width,
+                                   is_rotate, is_scale,
+                                   min_scale_factor=1., max_scale_factor=1.,
+                                   is_training=True):
     if is_training and label is None:
         raise ValueError('During training, label must be provided.')
 
@@ -16,37 +18,38 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width, min_sc
     processed_image = tf.cast(image, tf.float32)
     processed_label = tf.cast(label, tf.float32)
 
-    # randomly rotate
     # todo: rotate factor should be determined by command line
-    # todo: command line should be able to control whether rotate or not
-    rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
-    processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
-        processed_image, processed_label, rotate_factor)
-    processed_image.set_shape([None, None, 3])
+    if is_rotate:
+        # randomly rotate
+        rotate_factor = preprocess_utils.get_rotate_scale(min_rotate_factor=0, max_rotate_factor=359, step_size=90)
+        processed_image, processed_label = preprocess_utils.randomly_rotate_image_and_label(
+            processed_image, processed_label, rotate_factor)
+        processed_image.set_shape([None, None, 3])
 
-    # randomly scale
-    scale_factor = preprocess_utils.get_random_scale(
-        min_scale_factor, max_scale_factor, 0)
-    processed_image, processed_label = preprocess_utils.randomly_scale_image_and_label(
-        processed_image, processed_label, scale_factor)
-    processed_image.set_shape([None, None, 3])
+    if is_scale:
+        # randomly scale
+        scale_factor = preprocess_utils.get_random_scale(
+            min_scale_factor, max_scale_factor, 0)
+        processed_image, processed_label = preprocess_utils.randomly_scale_image_and_label(
+            processed_image, processed_label, scale_factor)
+        processed_image.set_shape([None, None, 3])
 
-    # Pad image to have dimensions >= [crop_height, crop_width]
-    image_shape = tf.shape(input=processed_image)
-    image_height = image_shape[0]
-    image_width = image_shape[1]
+        # Pad image to have dimensions >= [crop_height, crop_width]
+        image_shape = tf.shape(input=processed_image)
+        image_height = image_shape[0]
+        image_width = image_shape[1]
 
-    target_height = image_height + tf.maximum(crop_height - image_height, 0)
-    target_width = image_width + tf.maximum(crop_width - image_width, 0)
+        target_height = image_height + tf.maximum(crop_height - image_height, 0)
+        target_width = image_width + tf.maximum(crop_width - image_width, 0)
 
-    # Pad image with mean pixel value.
-    mean_pixel = tf.reshape([0., 0., 0.], [1, 1, 3])  # [127.5, 127.5, 127.5]
-    processed_image = preprocess_utils.pad_to_bounding_box(
-        processed_image, 0, 0, target_height, target_width, mean_pixel)
+        # Pad image with mean pixel value.
+        mean_pixel = tf.reshape([127.5, 127.5, 127.5], [1, 1, 3])  # [127.5, 127.5, 127.5]
+        processed_image = preprocess_utils.pad_to_bounding_box(
+            processed_image, 0, 0, target_height, target_width, mean_pixel)
 
-    # crop to [crop_height,crop_width]
-    processed_image, processed_label = preprocess_utils.random_crop(processed_image, processed_label, crop_height,
-                                                                    crop_width)
+        # crop to [crop_height,crop_width]
+        processed_image, processed_label = preprocess_utils.random_crop(processed_image, processed_label, crop_height,
+                                                                        crop_width)
 
     if processed_label is not None:
         processed_label.set_shape([6])

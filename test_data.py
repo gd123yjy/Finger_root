@@ -61,6 +61,8 @@ def main(_):
         dataset_dir=FLAGS.dataset_dir,
         batch_size=clone_batch_size,
         crop_size=FLAGS.train_crop_size,
+        is_rotate=FLAGS.rotate,
+        is_scale=FLAGS.scale,
         min_scale_factor=FLAGS.min_scale_factor,
         max_scale_factor=FLAGS.max_scale_factor,
         num_readers=2,

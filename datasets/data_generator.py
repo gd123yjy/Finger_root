@@ -87,6 +87,8 @@ class Dataset(object):
                  dataset_dir,
                  batch_size,
                  crop_size,
+                 is_rotate,
+                 is_scale,
                  min_scale_factor=1.,
                  max_scale_factor=1.,
                  num_readers=1,
@@ -123,6 +125,8 @@ class Dataset(object):
         self.dataset_dir = dataset_dir
         self.batch_size = batch_size
         self.crop_size = crop_size
+        self.is_rotate = is_rotate
+        self.is_scale = is_scale
         self.min_scale_factor = min_scale_factor
         self.max_scale_factor = max_scale_factor
         self.num_readers = num_readers
@@ -213,6 +217,8 @@ class Dataset(object):
             preprocess_image_and_label_yjy(image=image, label=label,
                                            crop_height=self.crop_size[0],
                                            crop_width=self.crop_size[1],
+                                           is_rotate=self.is_rotate,
+                                           is_scale=self.is_scale,
                                            min_scale_factor=self.min_scale_factor,
                                            max_scale_factor=self.max_scale_factor,
                                            is_training=self.is_training)
