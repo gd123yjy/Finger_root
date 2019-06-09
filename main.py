@@ -120,6 +120,7 @@ def train(m_model, iterator, spe, epoch, initial_epoch):
 
 def eval_and_predict(m_model, iterator):
     test_loss, test_acc = m_model.evaluate(iterator, steps=200)
+    print('Test loss: ', test_loss)
     print('Test accuracy: ', test_acc)
 
     # predict
@@ -180,6 +181,7 @@ def main(_):
     # summary and save
     my_model.summary()
     # my_model.save(os.path.join(FLAGS.model_dir, 'Finger_roots.hdf5'))
+    # tf.keras.models.save_model()
 
 
 if __name__ == '__main__':

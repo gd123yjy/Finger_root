@@ -41,17 +41,6 @@ if __name__ == '__main__':
 
     m_model, _ = build_model()
 
-    try:
-        if FLAGS.model_name is None:
-            for x in os.listdir(FLAGS.model_dir):
-                if m_max < int(x[8:10]):
-                    m_model_name = x
-                    m_max = int(x[8:10])
-        # m_model = tf.keras.models.load_model(filepath=os.path.join(FLAGS.model_dir, m_model_name))
-        m_model.load_weights(filepath=os.path.join(FLAGS.model_dir, m_model_name))
-    except tf.errors.NotFoundError:
-        print('model file cannot be found')
-
     finCon_save_file = open(
         os.path.join(FLAGS.fincon_save_dir, "figCon_nn.txt"), 'w')
     files = os.listdir(FLAGS.image_dir)

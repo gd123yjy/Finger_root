@@ -15,22 +15,22 @@ def get_model():
     pool_2 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_2)
     dropout_2 = tf.keras.layers.Dropout(rate=0.2)(pool_2)
 
-    conv_3 = tf.keras.layers.Conv2D(filters=128, kernel_size=2, trainable=True)(dropout_2)
+    conv_3 = tf.keras.layers.Conv2D(filters=128, kernel_size=2)(dropout_2)
     pool_3 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_3)
     dropout_3 = tf.keras.layers.Dropout(rate=0.3)(pool_3)
 
-    conv_4 = tf.keras.layers.Conv2D(filters=128, kernel_size=1, trainable=True)(dropout_3)
+    conv_4 = tf.keras.layers.Conv2D(filters=128, kernel_size=1)(dropout_3)
     pool_4 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_4)
     dropout_4 = tf.keras.layers.Dropout(rate=0.3)(pool_4)
 
-    flatten_5 = tf.keras.layers.Flatten(input_shape=(30, 40), trainable=True)(dropout_4)
+    flatten_5 = tf.keras.layers.Flatten(input_shape=(30, 40))(dropout_4)
 
-    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.elu, trainable=True)(flatten_5)
+    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.sigmoid)(flatten_5)
     dropout_5 = tf.keras.layers.Dropout(rate=0.5)(dense_5)
 
-    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.elu, trainable=True)(dropout_5)
+    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.sigmoid)(dropout_5)
 
-    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.elu, trainable=True)(dense_6)
+    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.relu)(dense_6)
 
     return tf.keras.Model(inputs=inputs, outputs=dense_7)
 
