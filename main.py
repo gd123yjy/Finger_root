@@ -70,7 +70,7 @@ def build_model():
         keras.layers.Dense(10, activation=tf.nn.softmax)
     ])
     '''
-    m_optimizer = tf.keras.optimizers.Adam()  # lr=learning_rate
+    m_optimizer = tf.keras.optimizers.Adam(lr=learning_rate)  # lr=learning_rate
 
     try:
         if FLAGS.model_name is None:
