@@ -31,9 +31,9 @@ def pre_process(m_image):
 
 
 def post_process(m_coordinates):
-    x_factor = FLAGS.train_crop_size[1]
-    y_factor = FLAGS.train_crop_size[0]
-    result_float = m_coordinates * [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor]
+    x_factor = 1.0  # FLAGS.train_crop_size[1]
+    y_factor = 1.0  # FLAGS.train_crop_size[0]
+    result_float = m_coordinates * [[x_factor, y_factor, x_factor, y_factor, x_factor, y_factor]]
     return result_float.astype(np.int)
 
 

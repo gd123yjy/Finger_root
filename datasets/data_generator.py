@@ -241,23 +241,23 @@ class Dataset(object):
         return sample
 
     def _regularize_image(self, sample):
-        # both image and label should be normalized
+        # only image need to be normalized
         image = tf.cast(sample[common.IMAGE], dtype=tf.float64)
         origin_image = tf.cast(sample[common.IMAGE], dtype=tf.float64)
         image = tf.math.divide(image, tf.constant(value=255.0, dtype=tf.float64))
         origin_image = tf.math.divide(origin_image, tf.constant(value=255.0, dtype=tf.float64))
 
-        y_factor = FLAGS.train_crop_size[0]
-        x_factor = FLAGS.train_crop_size[1]
-        label = tf.cast(sample[common.LABEL], dtype=tf.float64)
-        origin_label = tf.cast(sample[common.ORIGINAL_LABEL], dtype=tf.float64)
-        label = tf.math.divide(label, [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor])
-        origin_label = tf.math.divide(origin_label, [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor])
+        # y_factor = FLAGS.train_crop_size[0]
+        # x_factor = FLAGS.train_crop_size[1]
+        # label = tf.cast(sample[common.LABEL], dtype=tf.float64)
+        # origin_label = tf.cast(sample[common.ORIGINAL_LABEL], dtype=tf.float64)
+        # label = tf.math.divide(label, [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor])
+        # origin_label = tf.math.divide(origin_label, [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor])
 
         sample[common.IMAGE] = image
         sample[common.ORIGINAL_IMAGE] = origin_image
-        sample[common.LABEL] = label
-        sample[common.ORIGINAL_LABEL] = origin_label
+        # sample[common.LABEL] = label
+        # sample[common.ORIGINAL_LABEL] = origin_label
 
         return sample
 

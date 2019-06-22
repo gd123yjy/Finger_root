@@ -25,12 +25,12 @@ def get_model():
 
     flatten_5 = tf.keras.layers.Flatten(input_shape=(30, 40))(dropout_4)
 
-    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.relu)(flatten_5)
+    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.elu)(flatten_5)
     dropout_5 = tf.keras.layers.Dropout(rate=0.5)(dense_5)
 
-    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.relu)(dropout_5)
+    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.elu)(dropout_5)
 
-    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.relu)(dense_6)
+    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.elu)(dense_6)
 
     return tf.keras.Model(inputs=inputs, outputs=dense_7)
 
