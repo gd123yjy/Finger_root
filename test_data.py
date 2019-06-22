@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import numpy as np
 
 import tensorflow as tf
 import cv2
@@ -15,6 +16,21 @@ FLAGS = flags.FLAGS
 # def get_test_model():
 #     inputs = tf.keras.Input(shape=(FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], 3))
 #     return tf.keras.Model(inputs=inputs, outputs=inputs)
+
+def pre_process(m_image):
+    image = tf.math.multiply(m_image, tf.constant(255.0, tf.float64))
+    image = tf.cast(image, dtype=tf.int64)
+    image = image.numpy()
+    image = image.astype('uint8').reshape((FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], FLAGS.image_channel))
+    return image
+
+
+def post_process(m_coordinates):
+    label = m_coordinates.numpy()
+    x_factor = FLAGS.train_crop_size[1]
+    y_factor = FLAGS.train_crop_size[0]
+    result_float = label * [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor]
+    return result_float.astype(np.int)
 
 
 def my_train(epoch, steps_per_epoch, batch_handler, iterator):
@@ -31,12 +47,8 @@ def my_train(epoch, steps_per_epoch, batch_handler, iterator):
 def handle_batch(images, labels):
     for i in range(len(images)):
         # image = images[i] * 255.0
-        image = tf.math.multiply(images[i], tf.constant(255.0, tf.float64))
-        image = tf.cast(image, dtype=tf.int64)
-        image = image.numpy()
-        image = image.astype('uint8').reshape((480, 640, 3))
-        label = tf.cast(labels[i], dtype=tf.int64)
-        label = label.numpy()
+        image = pre_process(images[i])
+        label = post_process(labels[i])
         # filename = time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime(time.time()))
         filename = '%f' % time.time()
         cv2.circle(image, (label[0], label[1]), 5, (0, 255, 0))
