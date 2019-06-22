@@ -22,13 +22,15 @@ flags.DEFINE_string('model_dir', '/home/yjy/models_pretrain/fingerRoot/LHand',
 flags.DEFINE_string('model_name', None, 'file name of model.')  # 'Finger_roots.h5'
 
 # preprocess
+flags.DEFINE_integer('image_channel', 3, 'Image channel,for example,RGB corresponds to 3 while gray is 1.')
 flags.DEFINE_float('min_scale_factor', 0.75,
                    'Mininum scale factor for data augmentation.')
-
 flags.DEFINE_float('max_scale_factor', 1.25,
                    'Maximum scale factor for data augmentation.')
 flags.DEFINE_multi_integer('train_crop_size', [480, 640],
                            'Image crop size [height, width] during training.')
+flags.DEFINE_bool('rotate', True, 'Whether rotate in pre-processing.')
+flags.DEFINE_bool('scale', False, 'Whether scale in pre-processing.')
 
 # learning
 flags.DEFINE_integer('batch_size', 8, 'batch size')
@@ -41,8 +43,7 @@ flags.DEFINE_integer('training_number_of_steps', int(400 * 60 * 0.5),
                      'The number of training steps per epoch ')
 flags.DEFINE_float('learning_rate_decay_factor', 0.5,
                    'The rate to decay the base learning rate.')
-flags.DEFINE_bool('rotate', True, 'Whether rotate in pre-processing.')
-flags.DEFINE_bool('scale', True, 'Whether scale in pre-processing.')
+
 
 # useless flags below:
 flags.DEFINE_enum('learning_policy', 'poly', ['poly', 'step'],
@@ -109,7 +110,7 @@ def train(m_model, iterator, spe, epoch, initial_epoch):
 
     # m_callbacks.append(tf.keras.callbacks.LearningRateScheduler(lr_adjust_callback, 1))
     m_callbacks.append(
-        tf.keras.callbacks.ModelCheckpoint(filepath=FLAGS.model_dir + '/weights.{epoch:02d}-{loss:.2f}.hdf5',
+        tf.keras.callbacks.ModelCheckpoint(filepath=FLAGS.model_dir + '/weights.{epoch:02d}-{loss:.6f}.hdf5',
                                            save_weights_only=False, verbose=1))
     # m_callbacks.append(tf.keras.callbacks.LambdaCallback(on_epoch_end=lambda batch, logs: print(logs['loss'])))
     m_model.fit(x=iterator, epochs=epoch, callbacks=m_callbacks, steps_per_epoch=spe)

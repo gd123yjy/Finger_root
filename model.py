@@ -5,7 +5,7 @@ FLAGS = flags.FLAGS
 
 
 def get_model():
-    inputs = tf.keras.Input(shape=(FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], 3))
+    inputs = tf.keras.Input(shape=(FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], FLAGS.image_channel))
 
     conv_1 = tf.keras.layers.Conv2D(filters=32, kernel_size=5)(inputs)
     pool_1 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_1)
@@ -30,7 +30,7 @@ def get_model():
 
     dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.sigmoid)(dropout_5)
 
-    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.relu)(dense_6)
+    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.sigmoid)(dense_6)
 
     return tf.keras.Model(inputs=inputs, outputs=dense_7)
 

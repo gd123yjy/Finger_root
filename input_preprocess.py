@@ -3,6 +3,9 @@ import tensorflow as tf
 
 from core import preprocess_utils
 
+flags = tf.compat.v1.app.flags
+FLAGS = flags.FLAGS
+
 
 def preprocess_image_and_label_yjy(image, label, crop_height, crop_width,
                                    is_rotate, is_scale,
@@ -24,7 +27,7 @@ def preprocess_image_and_label_yjy(image, label, crop_height, crop_width,
             min_scale_factor, max_scale_factor, 0)
         processed_image, processed_label = preprocess_utils.randomly_scale_image_and_label(
             processed_image, processed_label, scale_factor)
-        processed_image.set_shape([None, None, 3])
+        processed_image.set_shape([None, None, FLAGS.image_channel])
 
         # Pad image to have dimensions >= [crop_height, crop_width]
         image_shape = tf.shape(input=processed_image)

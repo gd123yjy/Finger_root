@@ -22,17 +22,19 @@ flags.DEFINE_string('fincon_save_dir',
 img_h = int(480)
 img_w = int(640)
 
-divided_factor = 255.0
-
 
 def pre_process(m_image):
+    divided_factor = 255.0
     # result = cv2.resize(src=m_image, dsize=None, fx=1, fy=1)
     m_image = m_image / divided_factor
     return m_image
 
 
 def post_process(m_coordinates):
-    return m_coordinates
+    x_factor = FLAGS.train_crop_size[1]
+    y_factor = FLAGS.train_crop_size[0]
+    result_float = m_coordinates * [x_factor, y_factor, x_factor, y_factor, x_factor, y_factor]
+    return result_float.astype(np.int)
 
 
 if __name__ == '__main__':
