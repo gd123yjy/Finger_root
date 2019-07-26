@@ -79,7 +79,8 @@ def build_model():
                 if m_max < int(x[8:10]):
                     m_model_name = x
                     m_max = int(x[8:10])
-        m_model = tf.keras.models.load_model(filepath=os.path.join(FLAGS.model_dir, m_model_name))
+        m_model = tf.keras.models.load_model(filepath=os.path.join(FLAGS.model_dir, m_model_name),
+                                             custom_objects={'leaky_relu': tf.nn.leaky_relu})
         # m_model.load_weights(filepath=os.path.join(FLAGS.model_dir, m_model_name))
 
     except tf.errors.NotFoundError as e:
