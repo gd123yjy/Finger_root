@@ -19,8 +19,8 @@ flags.DEFINE_string('fincon_save_dir',
                     '/home/yjy/PycharmProjects/Finger_roots_Eager/datasets/LHand/palmprint_trainval',
                     'Path to where the figCon_nn.txt to be saved.')
 
-img_h = int(480)
-img_w = int(640)
+img_h = int(FLAGS.train_crop_size[0])
+img_w = int(FLAGS.train_crop_size[1])
 
 
 def pre_process(m_image):
