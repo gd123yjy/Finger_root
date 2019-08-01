@@ -187,5 +187,6 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.compat.v1.enable_eager_execution()
-    tf.compat.v1.app.run(main=main)
+    # tf.compat.v1.enable_eager_execution()
+    # tf.compat.v1.app.run(main=main)
+    main(None)

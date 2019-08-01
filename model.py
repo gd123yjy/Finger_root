@@ -1,4 +1,5 @@
 import tensorflow as tf
+import MyLayer
 
 flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
@@ -7,32 +8,38 @@ FLAGS = flags.FLAGS
 def get_model():
     inputs = tf.keras.Input(shape=(FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], FLAGS.image_channel))
 
-    conv_1 = tf.keras.layers.Conv2D(filters=32, kernel_size=5)(inputs)
+    conv_1 = tf.keras.layers.Conv2D(filters=32, kernel_size=9)(inputs)
     pool_1 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_1)
     dropout_1 = tf.keras.layers.Dropout(rate=0.1)(pool_1)
 
-    conv_2 = tf.keras.layers.Conv2D(filters=64, kernel_size=2)(dropout_1)
+    conv_2 = tf.keras.layers.Conv2D(filters=64, kernel_size=7)(dropout_1)
     pool_2 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_2)
     dropout_2 = tf.keras.layers.Dropout(rate=0.2)(pool_2)
 
-    conv_3 = tf.keras.layers.Conv2D(filters=128, kernel_size=2)(dropout_2)
+    conv_3 = tf.keras.layers.Conv2D(filters=128, kernel_size=5)(dropout_2)
     pool_3 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_3)
     dropout_3 = tf.keras.layers.Dropout(rate=0.3)(pool_3)
 
-    conv_4 = tf.keras.layers.Conv2D(filters=128, kernel_size=1)(dropout_3)
+    conv_4 = tf.keras.layers.Conv2D(filters=128, kernel_size=3)(dropout_3)
     pool_4 = tf.keras.layers.MaxPool2D(pool_size=2, padding='same', data_format='channels_last')(conv_4)
     dropout_4 = tf.keras.layers.Dropout(rate=0.3)(pool_4)
 
-    flatten_5 = tf.keras.layers.Flatten(input_shape=(30, 40))(dropout_4)
+    conv_5 = tf.keras.layers.Conv2D(filters=3, kernel_size=5)(dropout_4)
 
-    dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.leaky_relu)(flatten_5)
-    dropout_5 = tf.keras.layers.Dropout(rate=0.5)(dense_5)
+    argmax_6 = MyLayer.MyLayer()(conv_5)
 
-    dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.leaky_relu)(dropout_5)
+    multied_8 = tf.keras.layers.Multiply()([argmax_6, tf.constant(value=16, shape=(6,), dtype=tf.float32)])
 
-    dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.leaky_relu)(dense_6)
+    # flatten_5 = tf.keras.layers.Flatten(input_shape=(31, 43))(dropout_4)
+    #
+    # dense_5 = tf.keras.layers.Dense(1000, activation=tf.nn.leaky_relu)(flatten_5)
+    # dropout_5 = tf.keras.layers.Dropout(rate=0.5)(dense_5)
+    #
+    # dense_6 = tf.keras.layers.Dense(1000, activation=tf.nn.leaky_relu)(dropout_5)
+    #
+    # dense_7 = tf.keras.layers.Dense(6, activation=tf.nn.leaky_relu)(dense_6)
 
-    return tf.keras.Model(inputs=inputs, outputs=dense_7)
+    return tf.keras.Model(inputs=inputs, outputs=multied_8)
 
 
 class MyModel(tf.keras.Model):
