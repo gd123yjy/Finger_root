@@ -16,7 +16,6 @@ def custom_op(x):
             output[i][2 * j + 1] = argmax / shape[1]
 
     output = output.astype(np.int)
-    print(output)
 
     def custom_grad(dy):
         def region_grad(dy):
@@ -52,14 +51,14 @@ def custom_op(x):
             dy = dy.numpy()
             result = np.zeros_like(x.numpy())
             for b in range(np.shape(dy)[0]):
-                for i in range(np.shape(dy)[1]):
-                    x_i = output[b][i % 2]
-                    y_i = output[b][i % 2]
-                    result[b][x_i][y_i][i % 3] = dy[b][i]
+                for i in range((int)(np.shape(dy)[1] / 2)):
+                    x_i = output[b][2 * i]
+                    y_i = output[b][2 * i + 1]
+                    result[b][x_i][y_i][i] = (dy[b][2 * i] + dy[b][2 * i + 1]) / 2
             result = tf.convert_to_tensor(result)
             return result
 
-        return mean_grad(dy)
+        return argmax_grad(dy)
 
     return tf.convert_to_tensor(output, dtype=tf.float32), custom_grad
 
