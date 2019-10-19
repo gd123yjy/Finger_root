@@ -3,6 +3,42 @@ import tensorflow.keras.layers as layers
 import numpy as np
 
 
+@tf.custom_gradient
+def custom_op(x):
+    shape = tf.shape(x).numpy()
+    output = np.zeros(shape=(shape[0], 2 * shape[-1]), dtype=np.float)
+
+    for i in range(shape[0]):
+        for j in range(shape[-1]):
+            flattened = tf.keras.backend.flatten(x[i][:][:][j])
+            argmax = tf.keras.backend.argmax(flattened).numpy()
+            output[i][2 * j] = argmax % shape[1]
+            output[i][2 * j + 1] = argmax / shape[1]
+
+    print(output)
+
+    def custom_grad(dy):
+        result = np.zeros_like(x.numpy())
+        dy = dy.numpy()
+        dy = np.sqrt(np.abs(dy))
+        for i in range(shape[0]):
+            for l in range(shape[3]):
+                low_bound = (int)(output[i][2 * l] - dy[i][2 * l] / 2)
+                up_bound = (int)(output[i][2 * l] + dy[i][2 * l] / 2)
+                if low_bound < 0: low_bound = 0
+                if up_bound > shape[1]: up_bound = shape[1]
+                for j in range(low_bound, up_bound):
+                    low_bound = (int)(output[i][2 * l + 1] - dy[i][2 * l + 1] / 2)
+                    up_bound = (int)(output[i][2 * l + 1] + dy[i][2 * l + 1] / 2)
+                    if low_bound < 0: low_bound = 0
+                    if up_bound > shape[2]: up_bound = shape[2]
+                    for k in range(low_bound, up_bound):
+                        result[i][j][k][l] = 1
+        return tf.convert_to_tensor(result)
+
+    return tf.convert_to_tensor(output, dtype=tf.float32), custom_grad
+
+
 class MyLayer(layers.Layer):
     '''calculate 2d argmax per channels
     input shape: (b,w,h,c)
@@ -23,21 +59,9 @@ class MyLayer(layers.Layer):
         super(MyLayer, self).build(input_shape)
 
     def call(self, inputs):
-        print(tf.executing_eagerly())
-        shape = tf.shape(inputs).numpy()
-        ouput = np.zeros(shape=(shape[0], 2 * shape[-1]), dtype=np.float)
-
-        for i in range(shape[0]):
-            for j in range(shape[-1]):
-                flattened = tf.keras.backend.flatten(inputs[i][:][:][j])
-                argmax = tf.keras.backend.argmax(flattened).numpy()
-                ouput[i][2 * j] = argmax[i] % shape[1]
-                ouput[i][2 * j + 1] = argmax[i] / shape[1]
-
-        return ouput
+        return custom_op(inputs)
 
     def compute_output_shape(self, input_shape):
         print(tf.executing_eagerly())
-
         shape = tf.TensorShape(input_shape).as_list()
         return tf.TensorShape((shape[0], 2 * shape[-1]))

@@ -1,9 +1,9 @@
 import tensorflow as tf
 import MyLayer
+import numpy as np
 
 flags = tf.compat.v1.app.flags
 FLAGS = flags.FLAGS
-
 
 def get_model():
     inputs = tf.keras.Input(shape=(FLAGS.train_crop_size[0], FLAGS.train_crop_size[1], FLAGS.image_channel))
@@ -26,7 +26,7 @@ def get_model():
 
     conv_5 = tf.keras.layers.Conv2D(filters=3, kernel_size=5)(dropout_4)
 
-    argmax_6 = MyLayer.MyLayer()(conv_5)
+    argmax_6 = MyLayer.MyLayer(name="mylayer")(conv_5)
 
     multied_8 = tf.keras.layers.Multiply()([argmax_6, tf.constant(value=16, shape=(6,), dtype=tf.float32)])
 
