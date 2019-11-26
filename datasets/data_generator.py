@@ -293,6 +293,27 @@ class Dataset(object):
         dataset = dataset.batch(self.batch_size).prefetch(self.batch_size)
         return tf.compat.v1.data.make_one_shot_iterator(dataset)
 
+    def get_tf_dataset(self):
+        files = self._get_all_files()
+
+        tfrecord_dataset = tf.data.TFRecordDataset(files, num_parallel_reads=self.num_readers)
+        dataset = (tfrecord_dataset
+                   .map(self._parse_function, num_parallel_calls=self.num_readers)
+                   .map(self._preprocess_image, num_parallel_calls=self.num_readers)
+                   .map(self._regularize_image, num_parallel_calls=self.num_readers)
+                   .map(self._reserve_input_and_target, num_parallel_calls=self.num_readers))
+
+        if self.should_shuffle:
+            dataset = dataset.shuffle(buffer_size=100)
+
+        if self.should_repeat:
+            dataset = dataset.repeat()  # Repeat forever for training.
+        else:
+            dataset = dataset.repeat(1)
+
+        dataset = dataset.batch(self.batch_size).prefetch(self.batch_size)
+        return dataset
+
     def _get_all_files(self):
         """Gets all the files to read data from.
 

@@ -153,7 +153,7 @@ def main(_):
         is_training=True,
         should_shuffle=True,
         should_repeat=True)
-    train_iterator = train_dataset.get_one_shot_iterator()
+    train_iterator = train_dataset.get_tf_dataset()
 
     test_dataset = data_generator.Dataset(
         dataset_name=FLAGS.dataset,
@@ -169,7 +169,7 @@ def main(_):
         is_training=False,
         should_shuffle=True,
         should_repeat=True)
-    test_iterator = test_dataset.get_one_shot_iterator()
+    test_iterator = test_dataset.get_tf_dataset()
 
     # build model
     my_model, init_e = build_model()

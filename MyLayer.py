@@ -34,17 +34,21 @@ def custom_op(x):
                         if low_bound < 0: low_bound = 0
                         if up_bound > shape[2]: up_bound = shape[2]
                         for k in range(low_bound, up_bound):
-                            result[i][j][k][l] = 1
+                            result[i][j][k][l] = 0.001  # -0.001 ?
             result = tf.convert_to_tensor(result)
             return result
 
         def mean_grad(dy):
             dy = dy.numpy()
-            sum = 0
-            for i in range(np.shape(dy)[1]):
-                sum += dy[0][i]
-            result = np.full_like(x.numpy(), sum)
-            result = tf.convert_to_tensor(result / (shape[1] * shape[2] * 6))
+            result = np.zeros_like(x.numpy())
+            for b in range(shape[0]):
+                for i in range(shape[-1]):
+                    dy_sum = dy[b][2 * i] + dy[b][2 * i + 1]
+                    input_sum = np.sum(x[b][:][:][i])
+                    w = (output[b][2 * i] + output[b][2 * i + 1]) / input_sum
+                    for cols in range(shape[1]):
+                        for rows in range(shape[2]):
+                            result[b][cols][rows][i] = dy_sum * w / (shape[1] * shape[2])
             return result
 
         def argmax_grad(dy):
@@ -54,11 +58,12 @@ def custom_op(x):
                 for i in range((int)(np.shape(dy)[1] / 2)):
                     x_i = output[b][2 * i]
                     y_i = output[b][2 * i + 1]
-                    result[b][x_i][y_i][i] = (dy[b][2 * i] + dy[b][2 * i + 1]) / 2
-            result = tf.convert_to_tensor(result)
+                    result[b][x_i][y_i][i] = (dy[b][2 * i] + dy[b][2 * i + 1]) / (
+                            shape[1] * shape[2] * shape[1] * shape[2] * 2)
+            result = tf.convert_to_tensor(result, dtype=tf.float32)
             return result
 
-        return argmax_grad(dy)
+        return mean_grad(dy)
 
     return tf.convert_to_tensor(output, dtype=tf.float32), custom_grad
 
